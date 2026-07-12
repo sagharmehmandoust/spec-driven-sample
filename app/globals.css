@@ -25,6 +25,7 @@
   --color-state-error: var(--state-error);
   --color-state-success: var(--state-success);
   --color-state-warning: var(--state-warning);
+  --color-auth-panel: var(--bg-auth-panel);
 
   /* shadcn tokens */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -73,6 +74,7 @@
   --bg-surface: #111114;
   --bg-elevated: #18181c;
   --bg-subtle: #1e1e23;
+  --bg-auth-panel: color-mix(in srgb, var(--bg-surface) 88%, var(--accent-ai) 12%);
   --border-default: #2a2a30;
   --border-subtle: #3a3a42;
   --text-primary: #f0f0f4;
