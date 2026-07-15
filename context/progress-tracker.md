@@ -3,7 +3,7 @@
 Update this file whenever the current phase, active feature, or implementation state changes.
 
 ## Current Phase
-- Feature 05 (Prisma) — complete
+- Feature 07 (Wire Editor Home) — complete
 
 ## Current Goal
 - None
@@ -15,13 +15,15 @@ Update this file whenever the current phase, active feature, or implementation s
 - Feature 03: Auth — Clerk CLI linked to app_3GOtnxxrgcGD7y22I6sFxqZzkAv. @clerk/nextjs ^7.5.17 and @clerk/ui installed. proxy.ts protects all routes except public auth paths (from NEXT_PUBLIC_CLERK_SIGN_IN_URL / NEXT_PUBLIC_CLERK_SIGN_UP_URL) with /__clerk/:path* matcher. ClerkProvider in root layout uses Clerk dark theme + app CSS variable overrides (no hardcoded colors), Geist Sans via fontFamily. AuthShell 50/50 two-panel layout: tinted left panel (bg-auth-panel) with logo, headline, and icon feature list; dark right panel with centered Clerk form; form-only on small screens. Home redirects authenticated users to /editor and unauthenticated to /sign-in. UserButton in editor navbar right section. clerk doctor clean; build passes.
 - Feature 04: Project Dialogs — implemented `/editor` home CTA and Create/Rename/Delete dialogs with a dedicated `useProjectDialogs` hook. Sidebar is now wired to owned-only rename/delete actions plus mobile scrim/outside-close; slug preview updates live; no API calls or persistence.
 - Feature 05: Prisma — `prisma/models/project.prisma` defines `Project` (ownerId, name, optional description, DRAFT/ARCHIVED status, canvasJsonPath, timestamps, indexes on ownerId and createdAt) and `ProjectCollaborator` (composite projectId+email key, cascade delete, indexes on email and projectId+createdAt). `lib/prisma.ts` exports a cached singleton branching on `DATABASE_URL` (Accelerate for `prisma+postgres://`, `@prisma/adapter-pg` otherwise). Initial migration `20260715120012_init_project_models` applied; client generated to `app/generated/prisma/`. `@prisma/extension-accelerate` installed. Build passes.
+- Feature 06: Project APIs — REST routes at `GET/POST /api/projects` and `PATCH/DELETE /api/projects/[projectId]`. `lib/api-auth.ts` enforces Clerk auth (401 for unauthenticated). `lib/projects.ts` provides list/create/rename/delete helpers using Prisma with cuid IDs and `Untitled Project` default name. Owner checks on rename/delete return 403 for non-owners. UI not wired yet. Build passes.
+- Feature 07: Wire Editor Home — `app/editor/layout.tsx` fetches owned and shared projects server-side via `listOwnedProjects` / `listSharedProjects` and passes them into `EditorShell`. `app/editor/page.tsx` is a server component rendering client `EditorHome` CTA. `hooks/use-project-actions.ts` manages dialog state and project mutations: create generates slug + short suffix room ID, calls `POST /api/projects`, navigates to `/editor/[roomId]`; rename calls `PATCH` and refreshes; delete calls `DELETE`, redirects to `/editor` when deleting the active workspace or refreshes otherwise. Sidebar and dialogs wired to real API data with room ID preview, rename prefill, and delete project name. Build passes.
 
 ## In Progress
 
 - None.
 
 ## Next Up
-- Feature 06: Project APIs — REST routes for list/create/rename/delete with owner auth checks.
+- Feature 08: Editor Workspace Shell — build `/editor/[roomId]` with server-side access checks and workspace layout.
 
 
 

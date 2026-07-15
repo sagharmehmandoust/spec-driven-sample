@@ -8,13 +8,22 @@ import { ProjectDialogsProvider } from "@/components/editor/project-dialogs-prov
 
 interface EditorShellProps {
   children: React.ReactNode;
+  ownedProjects: Array<{ id: string; name: string }>;
+  sharedProjects: Array<{ id: string; name: string }>;
 }
 
-export function EditorShell({ children }: EditorShellProps) {
+export function EditorShell({
+  children,
+  ownedProjects,
+  sharedProjects,
+}: EditorShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <ProjectDialogsProvider>
+    <ProjectDialogsProvider
+      ownedProjects={ownedProjects}
+      sharedProjects={sharedProjects}
+    >
       <div className="flex min-h-0 flex-1 flex-col">
         <EditorNavbar
           isSidebarOpen={isSidebarOpen}
