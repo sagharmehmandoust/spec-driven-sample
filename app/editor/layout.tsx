@@ -20,11 +20,13 @@ export default async function EditorLayout({
     : [[], []];
 
   return (
-    <EditorShell
-      ownedProjects={ownedProjects.map(({ id, name }) => ({ id, name }))}
-      sharedProjects={sharedProjects.map(({ id, name }) => ({ id, name }))}
-    >
-      {children}
-    </EditorShell>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <EditorShell
+        ownedProjects={ownedProjects.map(({ id, name }) => ({ id, name }))}
+        sharedProjects={sharedProjects.map(({ id, name }) => ({ id, name }))}
+      >
+        {children}
+      </EditorShell>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Pencil, Plus, Trash2, X } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,6 +12,7 @@ import { useProjectDialogsApi } from "@/components/editor/project-dialogs-provid
 interface ProjectSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  activeRoomId?: string | null;
 }
 
 function EmptyProjectsState({ label }: { label: string }) {
@@ -26,7 +28,11 @@ function EmptyProjectsState({ label }: { label: string }) {
   );
 }
 
-export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
+export function ProjectSidebar({
+  isOpen,
+  onClose,
+  activeRoomId = null,
+}: ProjectSidebarProps) {
   const api = useProjectDialogsApi();
 
   return (
@@ -72,11 +78,19 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
                 {api.ownedProjects.map((project) => (
                   <div
                     key={project.id}
-                    className="group flex items-center justify-between gap-3 rounded-lg px-2 py-2 hover:bg-surface/60"
+                    className={cn(
+                      "group flex items-center justify-between gap-3 rounded-lg px-2 py-2 hover:bg-surface/60",
+                      activeRoomId === project.id &&
+                        "bg-accent-dim ring-1 ring-brand/30"
+                    )}
                   >
-                    <p className="min-w-0 flex-1 truncate text-sm font-medium text-copy-primary">
+                    <Link
+                      href={`/editor/${project.id}`}
+                      onClick={onClose}
+                      className="min-w-0 flex-1 truncate text-sm font-medium text-copy-primary"
+                    >
                       {project.name}
-                    </p>
+                    </Link>
 
                     {project.owned ? (
                       <div className="flex items-center gap-1">
@@ -109,14 +123,20 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
             ) : (
               <div className="flex flex-col gap-1.5 py-2">
                 {api.sharedProjects.map((project) => (
-                  <div
+                  <Link
                     key={project.id}
-                    className="rounded-lg px-2 py-2 hover:bg-surface/60"
+                    href={`/editor/${project.id}`}
+                    onClick={onClose}
+                    className={cn(
+                      "block rounded-lg px-2 py-2 hover:bg-surface/60",
+                      activeRoomId === project.id &&
+                        "bg-accent-dim ring-1 ring-brand/30"
+                    )}
                   >
                     <p className="truncate text-sm font-medium text-copy-primary">
                       {project.name}
                     </p>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

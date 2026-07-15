@@ -3,7 +3,7 @@
 Update this file whenever the current phase, active feature, or implementation state changes.
 
 ## Current Phase
-- Feature 07 (Wire Editor Home) — complete
+- Feature 09 (Share Dialog) — complete
 
 ## Current Goal
 - None
@@ -17,13 +17,15 @@ Update this file whenever the current phase, active feature, or implementation s
 - Feature 05: Prisma — `prisma/models/project.prisma` defines `Project` (ownerId, name, optional description, DRAFT/ARCHIVED status, canvasJsonPath, timestamps, indexes on ownerId and createdAt) and `ProjectCollaborator` (composite projectId+email key, cascade delete, indexes on email and projectId+createdAt). `lib/prisma.ts` exports a cached singleton branching on `DATABASE_URL` (Accelerate for `prisma+postgres://`, `@prisma/adapter-pg` otherwise). Initial migration `20260715120012_init_project_models` applied; client generated to `app/generated/prisma/`. `@prisma/extension-accelerate` installed. Build passes.
 - Feature 06: Project APIs — REST routes at `GET/POST /api/projects` and `PATCH/DELETE /api/projects/[projectId]`. `lib/api-auth.ts` enforces Clerk auth (401 for unauthenticated). `lib/projects.ts` provides list/create/rename/delete helpers using Prisma with cuid IDs and `Untitled Project` default name. Owner checks on rename/delete return 403 for non-owners. UI not wired yet. Build passes.
 - Feature 07: Wire Editor Home — `app/editor/layout.tsx` fetches owned and shared projects server-side via `listOwnedProjects` / `listSharedProjects` and passes them into `EditorShell`. `app/editor/page.tsx` is a server component rendering client `EditorHome` CTA. `hooks/use-project-actions.ts` manages dialog state and project mutations: create generates slug + short suffix room ID, calls `POST /api/projects`, navigates to `/editor/[roomId]`; rename calls `PATCH` and refreshes; delete calls `DELETE`, redirects to `/editor` when deleting the active workspace or refreshes otherwise. Sidebar and dialogs wired to real API data with room ID preview, rename prefill, and delete project name. Build passes.
+- Feature 08: Editor Workspace Shell — `app/editor/[roomId]/page.tsx` is a server component that redirects unauthenticated users to `/sign-in` and renders `AccessDenied` for missing or unauthorized projects. `lib/project-access.ts` provides `getCurrentIdentity`, `isProjectOwner`, `isProjectCollaborator`, and `hasProjectAccess` helpers. `components/editor/access-denied.tsx` shows a centered lock icon, message, and link back to `/editor`. `EditorShell` detects the active room from the pathname, shows the project name plus Share and AI sidebar toggle in the navbar, highlights the current room in `ProjectSidebar` with navigation links, and renders `AiSidebarPlaceholder` (right slide-over). Page content is `CanvasPlaceholder` (dark bg-base, centered message). No canvas, Liveblocks, AI chat, or sharing behavior yet. Build passes.
+- Feature 09: Share Dialog — Share button in `EditorNavbar` opens `ShareDialog` from `EditorShell`. `hooks/use-share-dialog.ts` manages invite/remove/copy-link state. `GET/POST/DELETE /api/projects/[projectId]/collaborators` list, invite, and remove collaborators with server-side owner enforcement on mutations and project-access checks on reads. `lib/collaborators.ts` handles Prisma CRUD; `lib/clerk-users.ts` enriches collaborator emails with Clerk display names and avatars (email-only fallback when no Clerk user). Owners get invite form, remove actions, and copy-link with temporary `Copied!` feedback; collaborators see a read-only list. `requireIdentity()` added to `lib/api-auth.ts`. Build passes.
 
 ## In Progress
 
 - None.
 
 ## Next Up
-- Feature 08: Editor Workspace Shell — build `/editor/[roomId]` with server-side access checks and workspace layout.
+- None yet.
 
 
 
