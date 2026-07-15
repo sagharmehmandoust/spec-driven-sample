@@ -3,9 +3,9 @@
 import React, { createContext, useContext } from "react";
 
 import { ProjectDialogs } from "@/components/editor/project-dialogs";
-import { useProjectDialogs } from "@/components/editor/use-project-dialogs";
+import { useProjectActions } from "@/hooks/use-project-actions";
 
-type ProjectDialogsApi = ReturnType<typeof useProjectDialogs>;
+type ProjectDialogsApi = ReturnType<typeof useProjectActions>;
 
 const ProjectDialogsContext = createContext<ProjectDialogsApi | null>(null);
 
@@ -21,10 +21,14 @@ export function useProjectDialogsApi() {
 
 export function ProjectDialogsProvider({
   children,
+  ownedProjects,
+  sharedProjects,
 }: Readonly<{
   children: React.ReactNode;
+  ownedProjects: Array<{ id: string; name: string }>;
+  sharedProjects: Array<{ id: string; name: string }>;
 }>) {
-  const api = useProjectDialogs();
+  const api = useProjectActions({ ownedProjects, sharedProjects });
 
   return (
     <ProjectDialogsContext.Provider value={api}>
@@ -33,4 +37,3 @@ export function ProjectDialogsProvider({
     </ProjectDialogsContext.Provider>
   );
 }
-

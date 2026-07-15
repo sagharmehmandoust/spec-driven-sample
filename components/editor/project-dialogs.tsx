@@ -2,15 +2,41 @@
 
 import { useEffect, useRef } from "react";
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { useProjectDialogs } from "@/components/editor/use-project-dialogs";
+import { useProjectActions } from "@/hooks/use-project-actions";
 
 type ProjectDialogsProps = {
-  api: ReturnType<typeof useProjectDialogs>;
+  api: ReturnType<typeof useProjectActions>;
 };
+
+const projectDialogContentClass =
+  "gap-0 rounded-3xl border border-surface-border bg-elevated p-6 shadow-2xl ring-0 sm:max-w-md";
+
+const projectDialogTitleClass = "text-lg font-semibold text-copy-primary";
+
+const projectDialogDescriptionClass = "text-sm text-copy-muted";
+
+const projectDialogFooterClass =
+  "mt-6 flex flex-row justify-end gap-3 border-0 bg-transparent p-0 -mx-0 -mb-0";
+
+const projectDialogInputClass =
+  "h-11 rounded-full border-2 border-surface-border bg-base px-5 text-sm text-copy-primary shadow-none placeholder:text-copy-muted focus-visible:border-brand focus-visible:ring-0";
+
+const projectDialogPrimaryButtonClass =
+  "h-10 rounded-full bg-brand px-6 text-sm font-medium text-primary-foreground hover:bg-brand/90";
+
+const projectDialogSecondaryButtonClass =
+  "h-10 rounded-full border border-surface-border bg-base px-6 text-sm font-medium text-copy-primary hover:bg-surface";
 
 export function ProjectDialogs({ api }: ProjectDialogsProps) {
   const renameInputRef = useRef<HTMLInputElement | null>(null);
@@ -18,7 +44,6 @@ export function ProjectDialogs({ api }: ProjectDialogsProps) {
   useEffect(() => {
     if (!api.renameOpen) return;
     renameInputRef.current?.focus();
-    // Place cursor at end for fast overwrites.
     const el = renameInputRef.current;
     if (!el) return;
     const len = el.value.length;
@@ -28,10 +53,15 @@ export function ProjectDialogs({ api }: ProjectDialogsProps) {
   return (
     <>
       {/* Create Project */}
-      <Dialog open={api.createOpen} onOpenChange={(open) => !open && api.closeCreate()}>
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Create Project</DialogTitle>
+      <Dialog
+        open={api.createOpen}
+        onOpenChange={(open) => !open && api.closeCreate()}
+      >
+        <DialogContent className={projectDialogContentClass}>
+          <DialogHeader className="gap-1.5">
+            <DialogTitle className={projectDialogTitleClass}>
+              Create Project
+            </DialogTitle>
           </DialogHeader>
 
           <form
@@ -39,36 +69,39 @@ export function ProjectDialogs({ api }: ProjectDialogsProps) {
               e.preventDefault();
               void api.submitCreate();
             }}
-            className="flex flex-col gap-3"
+            className="mt-5 flex flex-col gap-4"
           >
-            <div className="flex flex-col gap-1.5">
-              <span className="text-sm text-copy-muted">Project name</span>
-              <Input
-                value={api.createName}
-                onChange={(e) => api.setCreateName(e.target.value)}
-                autoComplete="off"
-                placeholder="e.g. Aurora Architecture"
-              />
-            </div>
+            <Input
+              value={api.createName}
+              onChange={(e) => api.setCreateName(e.target.value)}
+              autoComplete="off"
+              placeholder="Project name"
+              className={projectDialogInputClass}
+            />
 
-            <div className="text-xs text-copy-muted">
-              Slug preview:{" "}
+            <p className="text-xs text-copy-muted">
+              Room ID preview:{" "}
               <span className="text-copy-primary">
-                {api.createSlugPreview || "—"}
+                {api.createRoomIdPreview || "—"}
               </span>
-            </div>
+            </p>
 
-            <DialogFooter>
+            <DialogFooter className={projectDialogFooterClass}>
+              <Button
+                type="submit"
+                disabled={api.isCreating || !api.createName.trim()}
+                className={projectDialogPrimaryButtonClass}
+              >
+                {api.isCreating ? "Creating..." : "Create"}
+              </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => api.closeCreate()}
                 disabled={api.isCreating}
+                className={projectDialogSecondaryButtonClass}
               >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={api.isCreating || !api.createName.trim()}>
-                {api.isCreating ? "Creating..." : "Create"}
+                Close
               </Button>
             </DialogFooter>
           </form>
@@ -80,11 +113,13 @@ export function ProjectDialogs({ api }: ProjectDialogsProps) {
         open={api.renameOpen}
         onOpenChange={(open) => !open && api.closeRename()}
       >
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Rename Project</DialogTitle>
-            <DialogDescription>
-              Current project name: {api.renameProject?.name}
+        <DialogContent className={projectDialogContentClass}>
+          <DialogHeader className="gap-1.5">
+            <DialogTitle className={projectDialogTitleClass}>
+              Rename Project
+            </DialogTitle>
+            <DialogDescription className={projectDialogDescriptionClass}>
+              Renaming &ldquo;{api.renameProject?.name}&rdquo;
             </DialogDescription>
           </DialogHeader>
 
@@ -93,32 +128,33 @@ export function ProjectDialogs({ api }: ProjectDialogsProps) {
               e.preventDefault();
               void api.submitRename();
             }}
-            className="flex flex-col gap-3"
+            className="mt-5 flex flex-col gap-4"
           >
-            <div className="flex flex-col gap-1.5">
-              <span className="text-sm text-copy-muted">Project name</span>
-              <Input
-                ref={renameInputRef}
-                value={api.renameName}
-                onChange={(e) => api.setRenameName(e.target.value)}
-                autoComplete="off"
-              />
-            </div>
+            <Input
+              ref={renameInputRef}
+              value={api.renameName}
+              onChange={(e) => api.setRenameName(e.target.value)}
+              autoComplete="off"
+              placeholder="Project name"
+              className={projectDialogInputClass}
+            />
 
-            <DialogFooter>
+            <DialogFooter className={projectDialogFooterClass}>
+              <Button
+                type="submit"
+                disabled={api.isRenaming || !api.renameName.trim()}
+                className={projectDialogPrimaryButtonClass}
+              >
+                {api.isRenaming ? "Saving..." : "Save"}
+              </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => api.closeRename()}
                 disabled={api.isRenaming}
+                className={projectDialogSecondaryButtonClass}
               >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={api.isRenaming || !api.renameName.trim()}
-              >
-                {api.isRenaming ? "Renaming..." : "Rename"}
+                Close
               </Button>
             </DialogFooter>
           </form>
@@ -130,30 +166,33 @@ export function ProjectDialogs({ api }: ProjectDialogsProps) {
         open={api.deleteOpen}
         onOpenChange={(open) => !open && api.closeDelete()}
       >
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Delete Project</DialogTitle>
-            <DialogDescription>
-              This is a destructive confirmation only.
+        <DialogContent className={projectDialogContentClass}>
+          <DialogHeader className="gap-1.5">
+            <DialogTitle className={projectDialogTitleClass}>
+              Delete Project
+            </DialogTitle>
+            <DialogDescription className={projectDialogDescriptionClass}>
+              Deleting &ldquo;{api.deleteProject?.name}&rdquo;
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter>
+          <DialogFooter className={projectDialogFooterClass}>
+            <Button
+              type="button"
+              onClick={() => void api.submitDelete()}
+              disabled={api.isDeleting}
+              className="h-10 rounded-full bg-state-error px-6 text-sm font-medium text-base hover:bg-state-error/90"
+            >
+              {api.isDeleting ? "Deleting..." : "Delete"}
+            </Button>
             <Button
               type="button"
               variant="outline"
               onClick={() => api.closeDelete()}
               disabled={api.isDeleting}
+              className={projectDialogSecondaryButtonClass}
             >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => void api.submitDelete()}
-              disabled={api.isDeleting}
-            >
-              {api.isDeleting ? "Deleting..." : "Delete"}
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -161,4 +200,3 @@ export function ProjectDialogs({ api }: ProjectDialogsProps) {
     </>
   );
 }
-
