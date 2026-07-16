@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { AccessDenied } from "@/components/editor/access-denied";
-import { CanvasPlaceholder } from "@/components/editor/canvas-placeholder";
+import { CanvasRoom } from "@/components/editor/canvas-room";
 import {
   getCurrentIdentity,
   hasProjectAccess,
@@ -26,5 +26,5 @@ export default async function WorkspacePage({ params }: WorkspacePageProps) {
     return <AccessDenied />;
   }
 
-  return <CanvasPlaceholder />;
+  return <CanvasRoom roomId={roomId} />;
 }
