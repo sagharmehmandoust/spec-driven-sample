@@ -3,7 +3,7 @@
 Update this file whenever the current phase, active feature, or implementation state changes.
 
 ## Current Phase
-- Feature 09 (Share Dialog) — complete
+- Feature 11 (Base Canvas) — complete
 
 ## Current Goal
 - None
@@ -19,13 +19,15 @@ Update this file whenever the current phase, active feature, or implementation s
 - Feature 07: Wire Editor Home — `app/editor/layout.tsx` fetches owned and shared projects server-side via `listOwnedProjects` / `listSharedProjects` and passes them into `EditorShell`. `app/editor/page.tsx` is a server component rendering client `EditorHome` CTA. `hooks/use-project-actions.ts` manages dialog state and project mutations: create generates slug + short suffix room ID, calls `POST /api/projects`, navigates to `/editor/[roomId]`; rename calls `PATCH` and refreshes; delete calls `DELETE`, redirects to `/editor` when deleting the active workspace or refreshes otherwise. Sidebar and dialogs wired to real API data with room ID preview, rename prefill, and delete project name. Build passes.
 - Feature 08: Editor Workspace Shell — `app/editor/[roomId]/page.tsx` is a server component that redirects unauthenticated users to `/sign-in` and renders `AccessDenied` for missing or unauthorized projects. `lib/project-access.ts` provides `getCurrentIdentity`, `isProjectOwner`, `isProjectCollaborator`, and `hasProjectAccess` helpers. `components/editor/access-denied.tsx` shows a centered lock icon, message, and link back to `/editor`. `EditorShell` detects the active room from the pathname, shows the project name plus Share and AI sidebar toggle in the navbar, highlights the current room in `ProjectSidebar` with navigation links, and renders `AiSidebarPlaceholder` (right slide-over). Page content is `CanvasPlaceholder` (dark bg-base, centered message). No canvas, Liveblocks, AI chat, or sharing behavior yet. Build passes.
 - Feature 09: Share Dialog — Share button in `EditorNavbar` opens `ShareDialog` from `EditorShell`. `hooks/use-share-dialog.ts` manages invite/remove/copy-link state. `GET/POST/DELETE /api/projects/[projectId]/collaborators` list, invite, and remove collaborators with server-side owner enforcement on mutations and project-access checks on reads. `lib/collaborators.ts` handles Prisma CRUD; `lib/clerk-users.ts` enriches collaborator emails with Clerk display names and avatars (email-only fallback when no Clerk user). Owners get invite form, remove actions, and copy-link with temporary `Copied!` feedback; collaborators see a read-only list. `requireIdentity()` added to `lib/api-auth.ts`. Build passes.
+- Feature 10: Liveblocks Setup — `liveblocks.config.ts` defines Presence (`cursor`, `isThinking`) and UserMeta (`name`, `avatar`, `color`). `lib/liveblocks.ts` exports lazy-cached `getLiveblocks()` node client and deterministic `getCursorColor()` from a fixed palette. `POST /api/liveblocks-auth` requires Clerk auth, verifies project access via `hasProjectAccess`, ensures the room exists with `getOrCreateRoom`, and returns a session token with user name, avatar, and cursor color. Returns 403 for unauthorized access. Project ID is the Liveblocks room ID. `@liveblocks/node` installed. Build passes.
+- Feature 11: Base Canvas — Workspace page remains a server component; `CanvasRoom` wraps the client canvas with `LiveblocksProvider` (`/api/liveblocks-auth`), `RoomProvider` (initial presence `cursor: null`), `ClientSideSuspense`, and an `ErrorBoundary` for connection failures. `Canvas` uses `useLiveblocksFlow` with suspense and empty initial nodes/edges, wired into React Flow with loose connections, `fitView`, `MiniMap`, and a dot-pattern `Background`. Shared types in `types/canvas.ts` (`CanvasNodeData` with label/color/shape, `canvasNode`/`canvasEdge` types, `NODE_COLORS`, `NODE_SHAPES`). Placeholder removed. `react-error-boundary` installed. Build passes.
 
 ## In Progress
 
 - None.
 
 ## Next Up
-- None yet.
+- Feature 12: Shape Panel
 
 
 
