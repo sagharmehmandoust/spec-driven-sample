@@ -146,4 +146,49 @@
     --xy-minimap-mask-background-color-default: rgba(8, 8, 9, 0.65);
     --xy-minimap-node-background-color-default: var(--bg-elevated);
   }
+
+  .canvas-workspace .canvas-node-handle {
+    width: 8px;
+    height: 8px;
+    border-radius: 9999px;
+    background-color: var(--text-primary);
+    border: 1px solid var(--bg-base);
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .canvas-workspace .react-flow__node:hover .canvas-node-handle,
+  .canvas-workspace .react-flow__node.selected .canvas-node-handle,
+  .canvas-workspace .canvas-node-handle.connecting,
+  .canvas-workspace .canvas-node-handle.connectionindicator {
+    opacity: 1;
+  }
+
+  .canvas-workspace .react-flow__edge-path {
+    transition: opacity 120ms ease;
+  }
+
+  .canvas-workspace .canvas-edge-label-input {
+    field-sizing: content;
+  }
+
+  .canvas-workspace .node-color-swatch {
+    border-color: transparent;
+  }
+
+  .canvas-workspace .node-color-swatch:hover {
+    box-shadow: 0 0 6px 1px
+      color-mix(in srgb, var(--swatch-glow) 55%, transparent);
+  }
+
+  .canvas-workspace .node-color-swatch--active {
+    border-color: var(--swatch-glow);
+    box-shadow: 0 0 0 1px var(--swatch-glow);
+  }
+
+  .canvas-workspace .node-color-swatch--active:hover {
+    box-shadow:
+      0 0 0 1px var(--swatch-glow),
+      0 0 6px 1px color-mix(in srgb, var(--swatch-glow) 55%, transparent);
+  }
 }
