@@ -3,7 +3,7 @@
 Update this file whenever the current phase, active feature, or implementation state changes.
 
 ## Current Phase
-- Canvas polish — complete
+- Feature 18: Starter Templates — complete
 
 ## Current Goal
 - None
@@ -22,16 +22,20 @@ Update this file whenever the current phase, active feature, or implementation s
 - Feature 10: Liveblocks Setup — `liveblocks.config.ts` defines Presence (`cursor`, `isThinking`) and UserMeta (`name`, `avatar`, `color`). `lib/liveblocks.ts` exports lazy-cached `getLiveblocks()` node client and deterministic `getCursorColor()` from a fixed palette. `POST /api/liveblocks-auth` requires Clerk auth, verifies project access via `hasProjectAccess`, ensures the room exists with `getOrCreateRoom`, and returns a session token with user name, avatar, and cursor color. Returns 403 for unauthorized access. Project ID is the Liveblocks room ID. `@liveblocks/node` installed. Build passes.
 - Feature 11: Base Canvas — Workspace page remains a server component; `CanvasRoom` wraps the client canvas with `LiveblocksProvider` (`/api/liveblocks-auth`), `RoomProvider` (initial presence `cursor: null`), `ClientSideSuspense`, and an `ErrorBoundary` for connection failures. `Canvas` uses `useLiveblocksFlow` with suspense and empty initial nodes/edges, wired into React Flow with loose connections, `fitView`, `MiniMap`, and a dot-pattern `Background`. Shared types in `types/canvas.ts` (`CanvasNodeData` with label/color/shape, `canvasNode`/`canvasEdge` types, `NODE_COLORS`, `NODE_SHAPES`). Placeholder removed. `react-error-boundary` installed. Build passes.
 - Feature 12: Shape Panel — `ShapePanel` renders a floating pill toolbar at the bottom-center of the canvas with draggable Lucide icon buttons for all six shapes. `lib/canvas-shapes.ts` defines per-shape default sizes (rectangle wider than tall, circle square, diamond slightly larger), drag payload type/parsing, and ID generation (`shape-timestamp-counter`). `Canvas` wraps React Flow in `ReactFlowProvider`, handles `dragover`/`drop` on the canvas wrapper and React Flow pane, converts screen coords via `screenToFlowPosition`, and creates `canvasNode` nodes with empty label, default color, dragged shape, and payload dimensions. `CanvasNodeComponent` renders a simple bordered rectangle with centered label (placeholder for shape-specific visuals in Feature 13). Build passes.
-- Canvas polish — Fixed canvas visual issues: full-bleed dotted background via `.canvas-workspace` CSS vars matching `bg-base`, removed bottom bar/card layout (ShapePanel now floats over canvas), React Flow fills container with `h-full w-full`, MiniMap styled for dark theme. Fixed drag-and-drop: shape items use draggable `div` instead of `button`, dual MIME type payload (`application/canvas-shape` + `text/plain`), `getShapeDragPayload` helper. Fixed sidebar overlay: sidebars float over canvas with `opacity-0`/`invisible`/`pointer-events-none` when closed to fully hide (no peeking), editor layout uses `h-dvh`, main has `overflow-hidden`. `CanvasNodeComponent` now renders all six node shapes (rectangle/circle/pill via CSS, diamond/hexagon/cylinder via inline SVG) based on dropped shape type.
+- Canvas polish — Fixed canvas visual issues: full-bleed dotted background via `.canvas-workspace` CSS vars matching `bg-base`, removed bottom bar/card layout (ShapePanel now floats over canvas), React Flow fills container with `h-full w-full`, MiniMap styled for dark theme. Fixed drag-and-drop: shape items use draggable `div` instead of `button`, dual MIME type payload (`application/canvas-shape` + `text/plain`), `getShapeDragPayload` helper. Fixed sidebar overlay: sidebars float over canvas with `opacity-0`/`invisible`/`pointer-events-none` when closed to fully hide (no peeking), editor layout uses `h-dvh`, main has `overflow-hidden`.
+- Feature 13: Node Shape — Shared `ShapeVisual` renders rectangle/pill/circle via CSS and diamond/hexagon/cylinder via scaling SVG. Borders subtle at rest (`border-default`) and brighter when selected (`text-muted`). `CanvasNodeComponent` passes React Flow `selected` into shape visuals. `ShapeDragPreview` shows a cursor-following ghost at default size/opacity while dragging from the shape panel; browser drag image suppressed; preview clears on drop/cancel. Drop creation and shape panel layout unchanged. Build passes.
+- Feature 14: Node Editing — Selected nodes show `NodeResizer` with 40×40 min size and dark-theme handle/line styles. Double-click label area opens a centered textarea overlay; empty labels show a faded "Label" placeholder; typing updates via `updateNodeData` (Liveblocks sync); editing closes on blur or Escape; textarea uses `nodrag`/`nopan`/`nowheel`. Shape rendering, shape panel, and drop creation unchanged. Build passes.
+- Feature 15: Nodes Color Toolbar — Selected nodes show a floating `NodeColorToolbar` (React Flow `NodeToolbar`) above the node with one swatch per `NODE_COLORS` pair. Selecting a swatch updates `color` via `updateNodeData` (Liveblocks); text color stays paired via existing lookup. Active swatch ring + tight hover glow from the pair’s text color; `nodrag`/`nopan` prevent drag/pan. Build passes.
+- Feature 16: Edge Behavior — Nodes expose four connection handles (top/right/bottom/left), hidden until hover. New edges use custom `canvasEdge` type with smooth-step routing, rounded light stroke, arrowheads, dimmed rest opacity and brighter hover/selection, plus a wider invisible hit target. Double-click opens inline label editing via `EdgeLabelRenderer` + `getSmoothStepPath` midpoint; labels save through `updateEdgeData` (Liveblocks); saved labels render as pills, empty active edges show a faint hint; `nodrag`/`nopan` on label UI. Build passes.
+- Feature 17: Canvas Ergonomics — Bottom-left floating pill `CanvasControls` with zoom out / fit view / zoom in and Liveblocks undo/redo (disabled when unavailable). `hooks/useKeyboardShortcuts` wires `+`/`=` zoom in, `-` zoom out, Cmd/Ctrl+Z undo, Cmd/Ctrl+Shift+Z and Cmd/Ctrl+Y redo, skipping editable fields. MiniMap removed. Build passes.
+- Feature 18: Starter Templates — `starter-templates.ts` defines `CanvasTemplate` and three curated templates (Microservices, CI/CD Pipeline, Event-Driven) using shared canvas types and `NODE_COLORS`. `StarterTemplatesModal` shows a scrollable card grid with lightweight SVG/shape previews and Import actions. Navbar Templates button opens the modal via `StarterTemplatesDialogProvider`; import clears existing Liveblocks nodes/edges then adds the template and fits the view. Build passes.
 
 ## In Progress
 
 - None.
 
 ## Next Up
-- Feature 13: Node Shape
-
-
+- Feature 19: Presence Avatars & Cursor (TBD)
 
 ## Open Questions
 

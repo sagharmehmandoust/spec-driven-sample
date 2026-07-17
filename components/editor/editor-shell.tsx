@@ -8,6 +8,10 @@ import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
 import { ProjectDialogsProvider } from "@/components/editor/project-dialogs-provider";
 import { ShareDialog } from "@/components/editor/share-dialog";
+import {
+  StarterTemplatesDialogProvider,
+  useStarterTemplatesDialog,
+} from "@/components/editor/starter-templates-dialog-context";
 import { useShareDialog } from "@/hooks/use-share-dialog";
 
 interface EditorShellProps {
@@ -55,35 +59,77 @@ export function EditorShell({
       ownedProjects={ownedProjects}
       sharedProjects={sharedProjects}
     >
-      <div className="flex min-h-0 flex-1 flex-col">
-        <EditorNavbar
+      <StarterTemplatesDialogProvider>
+        <EditorShellContent
           isSidebarOpen={isSidebarOpen}
-          onSidebarToggle={() => setIsSidebarOpen((open) => !open)}
-          projectName={activeProject?.name}
+          setIsSidebarOpen={setIsSidebarOpen}
           isAiSidebarOpen={isAiSidebarOpen}
-          onAiSidebarToggle={() => setIsAiSidebarOpen((open) => !open)}
-          onShareClick={shareDialog.openShare}
-        />
-        <ProjectSidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
+          setIsAiSidebarOpen={setIsAiSidebarOpen}
           activeRoomId={activeRoomId}
-        />
-        {isWorkspace ? (
-          <AiSidebarPlaceholder
-            isOpen={isAiSidebarOpen}
-            onClose={() => setIsAiSidebarOpen(false)}
-          />
-        ) : null}
-        <main className="relative min-h-0 flex-1 overflow-hidden">{children}</main>
-        {isWorkspace ? (
-          <ShareDialog
-            api={shareDialog}
-            isOwner={activeProject?.isOwner ?? false}
-            projectId={activeRoomId}
-          />
-        ) : null}
-      </div>
+          activeProject={activeProject}
+          isWorkspace={isWorkspace}
+          shareDialog={shareDialog}
+        >
+          {children}
+        </EditorShellContent>
+      </StarterTemplatesDialogProvider>
     </ProjectDialogsProvider>
+  );
+}
+
+function EditorShellContent({
+  children,
+  isSidebarOpen,
+  setIsSidebarOpen,
+  isAiSidebarOpen,
+  setIsAiSidebarOpen,
+  activeRoomId,
+  activeProject,
+  isWorkspace,
+  shareDialog,
+}: {
+  children: React.ReactNode;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isAiSidebarOpen: boolean;
+  setIsAiSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  activeRoomId: string | null;
+  activeProject: { id: string; name: string; isOwner: boolean } | null;
+  isWorkspace: boolean;
+  shareDialog: ReturnType<typeof useShareDialog>;
+}) {
+  const templatesDialog = useStarterTemplatesDialog();
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <EditorNavbar
+        isSidebarOpen={isSidebarOpen}
+        onSidebarToggle={() => setIsSidebarOpen((open) => !open)}
+        projectName={activeProject?.name}
+        isAiSidebarOpen={isAiSidebarOpen}
+        onAiSidebarToggle={() => setIsAiSidebarOpen((open) => !open)}
+        onShareClick={shareDialog.openShare}
+        onTemplatesClick={isWorkspace ? templatesDialog.openDialog : undefined}
+      />
+      <ProjectSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        activeRoomId={activeRoomId}
+      />
+      {isWorkspace ? (
+        <AiSidebarPlaceholder
+          isOpen={isAiSidebarOpen}
+          onClose={() => setIsAiSidebarOpen(false)}
+        />
+      ) : null}
+      <main className="relative min-h-0 flex-1 overflow-hidden">{children}</main>
+      {isWorkspace ? (
+        <ShareDialog
+          api={shareDialog}
+          isOwner={activeProject?.isOwner ?? false}
+          projectId={activeRoomId}
+        />
+      ) : null}
+    </div>
   );
 }

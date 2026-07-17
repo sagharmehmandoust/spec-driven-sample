@@ -20,6 +20,9 @@ export const SHAPE_DEFAULT_SIZES: Record<
   hexagon: { width: 120, height: 104 },
 };
 
+export const MIN_NODE_WIDTH = 40;
+export const MIN_NODE_HEIGHT = 40;
+
 let nodeIdCounter = 0;
 
 export function createCanvasNodeId(shape: NodeShape): string {

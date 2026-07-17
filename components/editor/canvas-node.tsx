@@ -1,131 +1,144 @@
 "use client";
 
-import type { NodeProps } from "@xyflow/react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Handle,
+  NodeResizer,
+  Position,
+  useReactFlow,
+  type NodeProps,
+} from "@xyflow/react";
 
-import { NODE_COLORS, DEFAULT_NODE_COLOR } from "@/types/canvas";
-import type { CanvasNode, NodeShape } from "@/types/canvas";
+import { NodeColorToolbar } from "@/components/editor/node-color-toolbar";
+import { ShapeVisual } from "@/components/editor/shape-visual";
+import { MIN_NODE_HEIGHT, MIN_NODE_WIDTH } from "@/lib/canvas-shapes";
+import {
+  NODE_COLORS,
+  DEFAULT_NODE_COLOR,
+  type CanvasNode,
+  type NodeColorPair,
+} from "@/types/canvas";
+
+const LABEL_PLACEHOLDER = "Label";
+
+const HANDLE_POSITIONS = [
+  Position.Top,
+  Position.Right,
+  Position.Bottom,
+  Position.Left,
+] as const;
+
+const resizerHandleStyle = {
+  width: 8,
+  height: 8,
+  borderRadius: 2,
+  backgroundColor: "var(--bg-elevated)",
+  border: "1px solid var(--border-subtle)",
+};
+
+const resizerLineStyle = {
+  borderColor: "var(--border-default)",
+  borderWidth: 1,
+};
 
 function getTextColor(bgColor: string): string {
   const pair = NODE_COLORS.find((color) => color.bg === bgColor);
   return pair?.text ?? DEFAULT_NODE_COLOR.text;
 }
 
-interface ShapeVisualProps {
-  shape: NodeShape;
-  fill: string;
-}
-
-function ShapeVisual({ shape, fill }: ShapeVisualProps) {
-  const stroke = "var(--border-default)";
-
-  switch (shape) {
-    case "circle":
-      return (
-        <div
-          className="h-full w-full rounded-full border border-surface-border"
-          style={{ backgroundColor: fill }}
-        />
-      );
-
-    case "pill":
-      return (
-        <div
-          className="h-full w-full rounded-full border border-surface-border"
-          style={{ backgroundColor: fill }}
-        />
-      );
-
-    case "diamond":
-      return (
-        <svg
-          viewBox="0 0 100 100"
-          className="h-full w-full"
-          aria-hidden="true"
-        >
-          <polygon
-            points="50,4 96,50 50,96 4,50"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-
-    case "hexagon":
-      return (
-        <svg
-          viewBox="0 0 100 100"
-          className="h-full w-full"
-          aria-hidden="true"
-        >
-          <polygon
-            points="50,4 88,27 88,73 50,96 12,73 12,27"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
-
-    case "cylinder":
-      return (
-        <svg
-          viewBox="0 0 100 100"
-          className="h-full w-full"
-          aria-hidden="true"
-        >
-          <path
-            d="M12 24 C12 14 88 14 88 24 V76 C88 86 12 86 12 76 Z"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-          <ellipse
-            cx="50"
-            cy="24"
-            rx="38"
-            ry="12"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="1.5"
-          />
-          <path
-            d="M12 76 C12 86 88 86 88 76"
-            fill="none"
-            stroke={stroke}
-            strokeWidth="1.5"
-          />
-        </svg>
-      );
-
-    case "rectangle":
-    default:
-      return (
-        <div
-          className="h-full w-full rounded-xl border border-surface-border"
-          style={{ backgroundColor: fill }}
-        />
-      );
-  }
-}
-
-export function CanvasNodeComponent({ data }: NodeProps<CanvasNode>) {
+export function CanvasNodeComponent({
+  id,
+  data,
+  selected,
+}: NodeProps<CanvasNode>) {
   const textColor = getTextColor(data.color);
+  const { updateNodeData } = useReactFlow<CanvasNode>();
+  const [isEditing, setIsEditing] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!isEditing) return;
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    textarea.focus();
+    textarea.select();
+  }, [isEditing]);
+
+  function handleLabelChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    updateNodeData(id, { label: event.target.value });
+  }
+
+  function handleLabelKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    event.stopPropagation();
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setIsEditing(false);
+    }
+  }
+
+  function handleLabelDoubleClick(event: React.MouseEvent<HTMLDivElement>) {
+    event.stopPropagation();
+    setIsEditing(true);
+  }
+
+  function handleColorSelect(pair: NodeColorPair) {
+    updateNodeData(id, { color: pair.bg });
+  }
 
   return (
-    <div className="relative h-full w-full">
-      <ShapeVisual shape={data.shape} fill={data.color} />
-      {data.label ? (
-        <span
-          className="pointer-events-none absolute inset-0 flex items-center justify-center px-3 py-2 text-center text-sm leading-tight"
+    <div className="group relative h-full w-full">
+      <NodeColorToolbar
+        selected={!!selected}
+        activeColor={data.color}
+        onColorSelect={handleColorSelect}
+      />
+      <NodeResizer
+        isVisible={selected}
+        minWidth={MIN_NODE_WIDTH}
+        minHeight={MIN_NODE_HEIGHT}
+        color="var(--border-subtle)"
+        handleStyle={resizerHandleStyle}
+        lineStyle={resizerLineStyle}
+      />
+      <ShapeVisual shape={data.shape} fill={data.color} selected={selected} />
+      {isEditing ? (
+        <div className="absolute inset-0 flex items-center justify-center px-3 py-2">
+          <textarea
+            ref={textareaRef}
+            value={data.label}
+            placeholder={LABEL_PLACEHOLDER}
+            rows={1}
+            onChange={handleLabelChange}
+            onBlur={() => setIsEditing(false)}
+            onKeyDown={handleLabelKeyDown}
+            onMouseDown={(event) => event.stopPropagation()}
+            className="nodrag nopan nowheel max-h-full w-full resize-none overflow-y-auto bg-transparent text-center text-sm leading-tight outline-none placeholder:opacity-40 [field-sizing:content]"
+            style={{ color: textColor }}
+            aria-label="Node label"
+          />
+        </div>
+      ) : (
+        <div
+          onDoubleClick={handleLabelDoubleClick}
+          className="absolute inset-0 flex items-center justify-center px-3 py-2 text-center text-sm leading-tight"
           style={{ color: textColor }}
         >
-          {data.label}
-        </span>
-      ) : null}
+          {data.label ? (
+            <span className="line-clamp-3 wrap-break-word">{data.label}</span>
+          ) : (
+            <span className="opacity-40">{LABEL_PLACEHOLDER}</span>
+          )}
+        </div>
+      )}
+      {HANDLE_POSITIONS.map((position) => (
+        <Handle
+          key={position}
+          id={position}
+          type="source"
+          position={position}
+          className="canvas-node-handle"
+        />
+      ))}
     </div>
   );
 }
