@@ -15,7 +15,7 @@ interface CanvasRoomProps {
 
 function CanvasLoading() {
   return (
-    <div className="flex h-full min-h-0 items-center justify-center bg-base px-4">
+    <div className="flex h-full min-h-0 items-center justify-center bg-base">
       <p className="text-sm text-copy-muted">Loading canvas…</p>
     </div>
   );
@@ -23,7 +23,7 @@ function CanvasLoading() {
 
 function CanvasError() {
   return (
-    <div className="flex h-full min-h-0 items-center justify-center bg-base px-4">
+    <div className="flex h-full min-h-0 items-center justify-center bg-base">
       <p className="text-sm text-copy-muted">
         Unable to connect to the collaborative canvas. Please refresh and try
         again.

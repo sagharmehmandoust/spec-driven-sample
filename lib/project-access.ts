@@ -1,4 +1,5 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { cache } from "react";
 
 import { prisma } from "@/lib/prisma";
 
@@ -7,15 +8,47 @@ export interface ClerkIdentity {
   email: string;
 }
 
-export async function getCurrentIdentity(): Promise<ClerkIdentity | null> {
-  const { userId } = await auth();
-  if (!userId) return null;
+function getEmailFromSessionClaims(
+  sessionClaims: Record<string, unknown> | null | undefined
+): string {
+  if (!sessionClaims) return "";
 
-  const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress ?? "";
+  for (const key of ["email", "primary_email_address"]) {
+    const value = sessionClaims[key];
+    if (typeof value === "string" && value.length > 0) {
+      return value;
+    }
+  }
 
-  return { userId, email };
+  return "";
 }
+
+async function resolveUserEmail(
+  sessionClaims: Record<string, unknown> | null | undefined
+): Promise<string> {
+  const emailFromClaims = getEmailFromSessionClaims(sessionClaims);
+  if (emailFromClaims) {
+    return emailFromClaims;
+  }
+
+  try {
+    const user = await currentUser();
+    return user?.primaryEmailAddress?.emailAddress ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export const getCurrentIdentity = cache(
+  async (): Promise<ClerkIdentity | null> => {
+    const { isAuthenticated, userId, sessionClaims } = await auth();
+    if (!isAuthenticated || !userId) return null;
+
+    const email = await resolveUserEmail(sessionClaims);
+
+    return { userId, email };
+  }
+);
 
 export function isProjectOwner(
   project: { ownerId: string },

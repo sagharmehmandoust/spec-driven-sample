@@ -26,8 +26,10 @@ export function AiSidebarPlaceholder({
 
       <aside
         className={cn(
-          "fixed inset-y-3 right-3 z-50 flex w-80 flex-col overflow-hidden rounded-2xl border border-surface-border bg-base/95 shadow-lg backdrop-blur-sm transition-transform duration-300 ease-in-out",
-          isOpen ? "translate-x-0" : "translate-x-[calc(100%+1.5rem)]"
+          "fixed bottom-3 right-3 top-15 z-50 flex w-80 flex-col overflow-hidden rounded-2xl border border-surface-border bg-surface/95 shadow-lg backdrop-blur-sm transition-[transform,opacity,visibility] duration-300 ease-in-out",
+          isOpen
+            ? "visible translate-x-0 opacity-100"
+            : "invisible translate-x-[calc(100%+0.75rem)] opacity-0 pointer-events-none"
         )}
       >
         <div className="flex items-center justify-between border-b border-surface-border px-4 py-3">
