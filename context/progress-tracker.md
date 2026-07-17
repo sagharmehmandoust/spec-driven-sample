@@ -3,7 +3,7 @@
 Update this file whenever the current phase, active feature, or implementation state changes.
 
 ## Current Phase
-- Feature 11 (Base Canvas) — complete
+- Canvas polish — complete
 
 ## Current Goal
 - None
@@ -21,13 +21,15 @@ Update this file whenever the current phase, active feature, or implementation s
 - Feature 09: Share Dialog — Share button in `EditorNavbar` opens `ShareDialog` from `EditorShell`. `hooks/use-share-dialog.ts` manages invite/remove/copy-link state. `GET/POST/DELETE /api/projects/[projectId]/collaborators` list, invite, and remove collaborators with server-side owner enforcement on mutations and project-access checks on reads. `lib/collaborators.ts` handles Prisma CRUD; `lib/clerk-users.ts` enriches collaborator emails with Clerk display names and avatars (email-only fallback when no Clerk user). Owners get invite form, remove actions, and copy-link with temporary `Copied!` feedback; collaborators see a read-only list. `requireIdentity()` added to `lib/api-auth.ts`. Build passes.
 - Feature 10: Liveblocks Setup — `liveblocks.config.ts` defines Presence (`cursor`, `isThinking`) and UserMeta (`name`, `avatar`, `color`). `lib/liveblocks.ts` exports lazy-cached `getLiveblocks()` node client and deterministic `getCursorColor()` from a fixed palette. `POST /api/liveblocks-auth` requires Clerk auth, verifies project access via `hasProjectAccess`, ensures the room exists with `getOrCreateRoom`, and returns a session token with user name, avatar, and cursor color. Returns 403 for unauthorized access. Project ID is the Liveblocks room ID. `@liveblocks/node` installed. Build passes.
 - Feature 11: Base Canvas — Workspace page remains a server component; `CanvasRoom` wraps the client canvas with `LiveblocksProvider` (`/api/liveblocks-auth`), `RoomProvider` (initial presence `cursor: null`), `ClientSideSuspense`, and an `ErrorBoundary` for connection failures. `Canvas` uses `useLiveblocksFlow` with suspense and empty initial nodes/edges, wired into React Flow with loose connections, `fitView`, `MiniMap`, and a dot-pattern `Background`. Shared types in `types/canvas.ts` (`CanvasNodeData` with label/color/shape, `canvasNode`/`canvasEdge` types, `NODE_COLORS`, `NODE_SHAPES`). Placeholder removed. `react-error-boundary` installed. Build passes.
+- Feature 12: Shape Panel — `ShapePanel` renders a floating pill toolbar at the bottom-center of the canvas with draggable Lucide icon buttons for all six shapes. `lib/canvas-shapes.ts` defines per-shape default sizes (rectangle wider than tall, circle square, diamond slightly larger), drag payload type/parsing, and ID generation (`shape-timestamp-counter`). `Canvas` wraps React Flow in `ReactFlowProvider`, handles `dragover`/`drop` on the canvas wrapper and React Flow pane, converts screen coords via `screenToFlowPosition`, and creates `canvasNode` nodes with empty label, default color, dragged shape, and payload dimensions. `CanvasNodeComponent` renders a simple bordered rectangle with centered label (placeholder for shape-specific visuals in Feature 13). Build passes.
+- Canvas polish — Fixed canvas visual issues: full-bleed dotted background via `.canvas-workspace` CSS vars matching `bg-base`, removed bottom bar/card layout (ShapePanel now floats over canvas), React Flow fills container with `h-full w-full`, MiniMap styled for dark theme. Fixed drag-and-drop: shape items use draggable `div` instead of `button`, dual MIME type payload (`application/canvas-shape` + `text/plain`), `getShapeDragPayload` helper. Fixed sidebar overlay: sidebars float over canvas with `opacity-0`/`invisible`/`pointer-events-none` when closed to fully hide (no peeking), editor layout uses `h-dvh`, main has `overflow-hidden`. `CanvasNodeComponent` now renders all six node shapes (rectangle/circle/pill via CSS, diamond/hexagon/cylinder via inline SVG) based on dropped shape type.
 
 ## In Progress
 
 - None.
 
 ## Next Up
-- Feature 12: Shape Panel
+- Feature 13: Node Shape
 
 
 

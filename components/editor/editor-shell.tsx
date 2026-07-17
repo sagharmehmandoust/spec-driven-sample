@@ -75,7 +75,7 @@ export function EditorShell({
             onClose={() => setIsAiSidebarOpen(false)}
           />
         ) : null}
-        <main className="relative min-h-0 flex-1">{children}</main>
+        <main className="relative min-h-0 flex-1 overflow-hidden">{children}</main>
         {isWorkspace ? (
           <ShareDialog
             api={shareDialog}
