@@ -39,12 +39,12 @@ export function CanvasRoom({ roomId }: CanvasRoomProps) {
         id={roomId}
         initialPresence={{
           cursor: null,
-          isThinking: false,
+          thinking: false,
         }}
       >
         <ErrorBoundary fallback={<CanvasError />}>
           <ClientSideSuspense fallback={<CanvasLoading />}>
-            <Canvas />
+            <Canvas projectId={roomId} />
           </ClientSideSuspense>
         </ErrorBoundary>
       </RoomProvider>

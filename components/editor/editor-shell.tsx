@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { AiSidebarPlaceholder } from "@/components/editor/ai-sidebar-placeholder";
+import { AiSidebar } from "@/components/editor/ai-sidebar";
+import { CanvasSaveProvider } from "@/components/editor/canvas-save-context";
 import { EditorNavbar } from "@/components/editor/editor-navbar";
 import { ProjectSidebar } from "@/components/editor/project-sidebar";
 import { ProjectDialogsProvider } from "@/components/editor/project-dialogs-provider";
@@ -60,18 +61,20 @@ export function EditorShell({
       sharedProjects={sharedProjects}
     >
       <StarterTemplatesDialogProvider>
-        <EditorShellContent
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-          isAiSidebarOpen={isAiSidebarOpen}
-          setIsAiSidebarOpen={setIsAiSidebarOpen}
-          activeRoomId={activeRoomId}
-          activeProject={activeProject}
-          isWorkspace={isWorkspace}
-          shareDialog={shareDialog}
-        >
-          {children}
-        </EditorShellContent>
+        <CanvasSaveProvider>
+          <EditorShellContent
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            isAiSidebarOpen={isAiSidebarOpen}
+            setIsAiSidebarOpen={setIsAiSidebarOpen}
+            activeRoomId={activeRoomId}
+            activeProject={activeProject}
+            isWorkspace={isWorkspace}
+            shareDialog={shareDialog}
+          >
+            {children}
+          </EditorShellContent>
+        </CanvasSaveProvider>
       </StarterTemplatesDialogProvider>
     </ProjectDialogsProvider>
   );
@@ -110,6 +113,7 @@ function EditorShellContent({
         onAiSidebarToggle={() => setIsAiSidebarOpen((open) => !open)}
         onShareClick={shareDialog.openShare}
         onTemplatesClick={isWorkspace ? templatesDialog.openDialog : undefined}
+        showUserButton={!isWorkspace}
       />
       <ProjectSidebar
         isOpen={isSidebarOpen}
@@ -117,7 +121,7 @@ function EditorShellContent({
         activeRoomId={activeRoomId}
       />
       {isWorkspace ? (
-        <AiSidebarPlaceholder
+        <AiSidebar
           isOpen={isAiSidebarOpen}
           onClose={() => setIsAiSidebarOpen(false)}
         />
