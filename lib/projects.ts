@@ -55,3 +55,13 @@ export async function deleteProject(projectId: string) {
     where: { id: projectId },
   });
 }
+
+export async function updateProjectCanvasPath(
+  projectId: string,
+  canvasJsonPath: string
+) {
+  return prisma.project.update({
+    where: { id: projectId },
+    data: { canvasJsonPath },
+  });
+}

@@ -3,12 +3,17 @@
 import { UserButton } from "@clerk/nextjs";
 import {
   Bot,
+  Check,
+  CloudUpload,
   LayoutTemplate,
+  LoaderCircle,
   PanelLeftClose,
   PanelLeftOpen,
   Share2,
+  TriangleAlert,
 } from "lucide-react";
 
+import { useOptionalCanvasSaveStatus } from "@/components/editor/canvas-save-context";
 import { Button } from "@/components/ui/button";
 
 interface EditorNavbarProps {
@@ -19,6 +24,48 @@ interface EditorNavbarProps {
   onAiSidebarToggle?: () => void;
   onShareClick?: () => void;
   onTemplatesClick?: () => void;
+  /** When false, UserButton is omitted (canvas presence group owns it). Default true. */
+  showUserButton?: boolean;
+}
+
+function SaveStatusLabel({
+  status,
+}: {
+  status: "idle" | "saving" | "saved" | "error";
+}) {
+  if (status === "saving") {
+    return (
+      <>
+        <LoaderCircle className="h-4 w-4 animate-spin" />
+        Saving…
+      </>
+    );
+  }
+
+  if (status === "saved") {
+    return (
+      <>
+        <Check className="h-4 w-4 text-state-success" />
+        Saved
+      </>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <>
+        <TriangleAlert className="h-4 w-4 text-state-error" />
+        Error
+      </>
+    );
+  }
+
+  return (
+    <>
+      <CloudUpload className="h-4 w-4" />
+      Save
+    </>
+  );
 }
 
 export function EditorNavbar({
@@ -29,8 +76,10 @@ export function EditorNavbar({
   onAiSidebarToggle,
   onShareClick,
   onTemplatesClick,
+  showUserButton = true,
 }: EditorNavbarProps) {
   const isWorkspace = Boolean(projectName);
+  const canvasSave = useOptionalCanvasSaveStatus();
 
   return (
     <header className="flex h-12 shrink-0 items-center border-b border-surface-border bg-surface">
@@ -60,6 +109,19 @@ export function EditorNavbar({
       <div className="flex flex-1 items-center justify-end gap-2 px-3">
         {isWorkspace ? (
           <>
+            {canvasSave ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => canvasSave.saveNow?.()}
+                disabled={
+                  canvasSave.status === "saving" || canvasSave.saveNow === null
+                }
+                aria-label="Save canvas"
+              >
+                <SaveStatusLabel status={canvasSave.status} />
+              </Button>
+            ) : null}
             <Button
               variant="outline"
               size="sm"
@@ -88,7 +150,7 @@ export function EditorNavbar({
             </Button>
           </>
         ) : null}
-        <UserButton />
+        {showUserButton ? <UserButton /> : null}
       </div>
     </header>
   );

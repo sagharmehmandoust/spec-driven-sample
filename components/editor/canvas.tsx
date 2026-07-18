@@ -19,10 +19,14 @@ import "@xyflow/react/dist/style.css";
 import { CanvasControls } from "@/components/editor/canvas-controls";
 import { CanvasEdgeComponent } from "@/components/editor/canvas-edge";
 import { CanvasNodeComponent } from "@/components/editor/canvas-node";
+import { LiveCursors } from "@/components/editor/live-cursors";
+import { PresenceAvatars } from "@/components/editor/presence-avatars";
 import { ShapePanel } from "@/components/editor/shape-panel";
 import { useStarterTemplatesDialog } from "@/components/editor/starter-templates-dialog-context";
 import { StarterTemplatesModal } from "@/components/editor/starter-templates-modal";
 import type { CanvasTemplate } from "@/components/editor/starter-templates";
+import { useCanvasAutosave } from "@/hooks/use-canvas-autosave";
+import { useCanvasLoad } from "@/hooks/use-canvas-load";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import {
   createCanvasNodeId,
@@ -58,7 +62,11 @@ const defaultEdgeOptions = {
   },
 };
 
-function CanvasContent() {
+interface CanvasContentProps {
+  projectId: string;
+}
+
+function CanvasContent({ projectId }: CanvasContentProps) {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onDelete } =
     useLiveblocksFlow<CanvasNode, CanvasEdge>({
       suspense: true,
@@ -70,6 +78,21 @@ function CanvasContent() {
   const undo = useUndo();
   const redo = useRedo();
   const templatesDialog = useStarterTemplatesDialog();
+
+  const canvasReady = useCanvasLoad({
+    projectId,
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+  });
+
+  useCanvasAutosave({
+    projectId,
+    nodes,
+    edges,
+    enabled: canvasReady,
+  });
 
   useKeyboardShortcuts({
     reactFlow,
@@ -172,7 +195,9 @@ function CanvasContent() {
         proOptions={{ hideAttribution: true }}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+        <LiveCursors />
       </ReactFlow>
+      <PresenceAvatars />
       <CanvasControls />
       <ShapePanel />
       <StarterTemplatesModal
@@ -184,10 +209,14 @@ function CanvasContent() {
   );
 }
 
-export function Canvas() {
+interface CanvasProps {
+  projectId: string;
+}
+
+export function Canvas({ projectId }: CanvasProps) {
   return (
     <ReactFlowProvider>
-      <CanvasContent />
+      <CanvasContent projectId={projectId} />
     </ReactFlowProvider>
   );
 }
